@@ -1,0 +1,75 @@
+# ===== Android Studio / IntelliJ =====
+.idea/
+*.iml
+*.ipr
+*.iws
+.out/
+.cxx/
+.externalNativeBuild/
+
+# Local configuration
+local.properties
+sdk.dir/
+
+# ===== Gradle =====
+.gradle/
+build/
+**/build/
+
+# Gradle cache & temp files
+gradle-app.setting
+!gradle-wrapper.jar
+
+# ===== Kotlin / Java =====
+*.class
+*.log
+
+# ===== Android =====
+*.apk
+*.aab
+*.ap_
+*.dex
+captures/
+generated/
+
+# ===== Native (NDK) =====
+obj/
+*.so
+
+# ===== Signing =====
+*.jks
+*.keystore
+*.key
+*.pem
+
+# ===== OS / Editor =====
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# ===== Firebase / Google Services =====
+google-services.json
+**/google-services.json
+
+# ===== Secrets & Env =====
+.env
+.env.*
+secrets.properties
+
+# ===== Claude Code =====
+.claude/
+claude.md
+claude.local.md
+.claude.env
+.claude.settings.json
+
+# ===== Testing / Reports =====
+reports/
+test-results/
+coverage/
+
+# ===== Misc =====
+lint.xml
+lint-baseline.xml
