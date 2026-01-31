@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:padding="16dp"
+    android:background="?android:selectableItemBackground"
+    android:gravity="center_vertical">
+
+    <!-- Avatar placeholder -->
+    <FrameLayout
+        android:layout_width="48dp"
+        android:layout_height="48dp">
+
+        <ImageView
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:src="@android:drawable/ic_menu_my_calendar"
+            android:background="@android:color/darker_gray"
+            android:padding="8dp"
+            tools:ignore="ContentDescription" />
+
+        <!-- Unread badge -->
+        <TextView
+            android:id="@+id/unreadBadge"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_gravity="top|end"
+            android:background="@android:color/holo_blue_dark"
+            android:gravity="center"
+            android:textColor="@android:color/white"
+            android:textSize="10sp"
+            android:visibility="gone"
+            tools:text="3"
+            tools:visibility="visible" />
+
+    </FrameLayout>
+
+    <!-- Content -->
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:layout_marginStart="12dp"
+        android:layout_marginEnd="8dp">
+
+        <!-- Name row -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:id="@+id/conversationName"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:textSize="16sp"
+                tools:text="+1 (416) 555-1234" />
+
+            <!-- Matrix sync indicator -->
+            <ImageView
+                android:id="@+id/matrixIcon"
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:layout_marginStart="4dp"
+                android:src="@android:drawable/ic_menu_share"
+                android:visibility="gone"
+                tools:ignore="ContentDescription"
+                tools:visibility="visible" />
+
+            <!-- Error indicator -->
+            <ImageView
+                android:id="@+id/errorIcon"
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:layout_marginStart="4dp"
+                android:src="@android:drawable/ic_dialog_alert"
+                android:visibility="gone"
+                tools:ignore="ContentDescription"
+                tools:visibility="visible" />
+
+        </LinearLayout>
+
+        <!-- Preview row -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="2dp"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:id="@+id/conversationPreview"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:textColor="?android:textColorSecondary"
+                android:textSize="14sp"
+                tools:text="Hey, are you free for lunch tomorrow?" />
+
+            <TextView
+                android:id="@+id/conversationTimestamp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:textColor="?android:textColorSecondary"
+                android:textSize="12sp"
+                tools:text="2:30 PM" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</LinearLayout>

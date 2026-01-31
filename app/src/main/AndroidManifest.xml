@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- SMS Permissions (required for default SMS app) -->
+    <uses-permission android:name="android.permission.RECEIVE_SMS" />
+    <uses-permission android:name="android.permission.READ_SMS" />
+    <uses-permission android:name="android.permission.SEND_SMS" />
+    <uses-permission android:name="android.permission.RECEIVE_MMS" />
+    <uses-permission android:name="android.permission.RECEIVE_WAP_PUSH" />
+
+    <!-- Network for Matrix communication -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+    <!-- Foreground service permissions -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
+    <!-- Optional: contact lookup -->
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
+
+    <!-- Phone state for dual SIM support -->
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+
+    <!-- Receive boot completed to restart service -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+
+    <!-- Query for SMS-capable apps (required for Android 11+ package visibility) -->
+    <queries>
+        <!-- Query for apps that can send SMS -->
+        <intent>
+            <action android:name="android.intent.action.SENDTO" />
+            <data android:scheme="smsto" />
+        </intent>
+        <!-- Query for apps that can handle SMS viewing -->
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:scheme="sms" />
+        </intent>
+        <!-- Query for RESPOND_VIA_MESSAGE capable apps -->
+        <intent>
+            <action android:name="android.intent.action.RESPOND_VIA_MESSAGE" />
+            <data android:scheme="smsto" />
+        </intent>
+    </queries>
+
+    <application
+        android:name=".BridgeApplication"
+        android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.SmsMatrixBridge"
+        tools:targetApi="34">
+
+        <!-- Main Activity: minimal UI for configuration and SMS role request -->
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:label="@string/app_name">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- Status Activity: bridge health and observability -->
+        <activity
+            android:name=".status.StatusActivity"
+            android:exported="false"
+            android:label="Bridge Status" />
+
+        <!-- Conversation List Activity: SMS inbox -->
+        <activity
+            android:name=".ui.ConversationListActivity"
+            android:exported="false"
+            android:label="Messages" />
+
+        <!-- Conversation Activity: single conversation view -->
+        <activity
+            android:name=".ui.ConversationActivity"
+            android:exported="false"
+            android:label="Conversation"
+            android:windowSoftInputMode="adjustResize" />
+
+        <!-- New Conversation Activity -->
+        <activity
+            android:name=".ui.NewConversationActivity"
+            android:exported="false"
+            android:label="New conversation" />
+
+        <!-- Required for default SMS app: activity to handle SMS send intents -->
+        <activity
+            android:name=".ComposeSmsActivity"
+            android:exported="true"
+            android:label="@string/app_name">
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+                <action android:name="android.intent.action.SENDTO" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="sms" />
+                <data android:scheme="smsto" />
+                <data android:scheme="mms" />
+                <data android:scheme="mmsto" />
+            </intent-filter>
+        </activity>
+
+        <!-- Foreground Service: coordinates SMS ↔ Matrix bridging -->
+        <service
+            android:name=".BridgeService"
+            android:enabled="true"
+            android:exported="false"
+            android:foregroundServiceType="specialUse">
+            <property
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="sms_matrix_bridge" />
+        </service>
+
+        <!-- SMS Receiver: handles incoming SMS messages -->
+        <receiver
+            android:name=".SmsReceiver"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="android.permission.BROADCAST_SMS">
+            <!-- SMS_DELIVER is required for default SMS app role -->
+            <intent-filter>
+                <action android:name="android.provider.Telephony.SMS_DELIVER" />
+            </intent-filter>
+            <!-- SMS_RECEIVED for monitoring when not default app -->
+            <intent-filter android:priority="999">
+                <action android:name="android.provider.Telephony.SMS_RECEIVED" />
+            </intent-filter>
+        </receiver>
+
+        <!-- Required for default SMS app: MMS receiver (stub) -->
+        <receiver
+            android:name=".MmsReceiver"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="android.permission.BROADCAST_WAP_PUSH">
+            <!-- WAP_PUSH_DELIVER is required for default SMS app role -->
+            <intent-filter>
+                <action android:name="android.provider.Telephony.WAP_PUSH_DELIVER" />
+                <data android:mimeType="application/vnd.wap.mms-message" />
+            </intent-filter>
+        </receiver>
+
+        <!-- Required for default SMS app: delivery report service -->
+        <service
+            android:name=".HeadlessSmsSendService"
+            android:exported="true"
+            android:permission="android.permission.SEND_RESPOND_VIA_MESSAGE">
+            <intent-filter>
+                <action android:name="android.intent.action.RESPOND_VIA_MESSAGE" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:scheme="sms" />
+                <data android:scheme="smsto" />
+                <data android:scheme="mms" />
+                <data android:scheme="mmsto" />
+            </intent-filter>
+        </service>
+
+        <!-- Boot receiver to restart bridge service -->
+        <receiver
+            android:name=".BootReceiver"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+            </intent-filter>
+        </receiver>
+
+    </application>
+
+</manifest>
